@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/home/chengs/software/catkin_ws/devel/include/**",
+                "/opt/ros/melodic/include/**",
+                "/home/chengs/software/catkin_ws/src/can_bus/include/**",
+                "/home/chengs/software/catkin_ws/src/esd_can/include/**",
+                "/usr/include/**",
+                "/home/chengs/autoware.ai/**"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++14"
+        }
+    ],
+    "version": 4
+}
