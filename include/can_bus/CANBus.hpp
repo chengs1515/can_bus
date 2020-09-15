@@ -21,10 +21,11 @@ class CANBus{
 
 public:
     CANBus(ros::NodeHandle &NodeHandle);
+    void timerCallback(const ros::TimerEvent& event);
 
 private:
     ros::NodeHandle nh_;
-    std::unique_ptr<can_bus::EsdCAN> can_client_;
+    can_bus::EsdCAN* can_client_;
     ros::Subscriber ctr_sub_;
     ros::Publisher ctr_pub_;
     ros::Publisher caninfo_pub_;
@@ -36,21 +37,24 @@ private:
     autoware_can_msgs::CANInfo can_info_;
 
     Interpolation2d::DataType xyz_;
-    std::unique_ptr<Interpolation2d> ctr_interp_;
+    Interpolation2d ctr_interp_;
 
     double  vel_ = 0;
     double steer_transmission_ratio_ = 1;
     double steer_single_direction_max_degree_ = 0.52359877559;
     double throttle_deadzone_ = 9;
     double brake_deadzone_ = 9;
+    int32_t send_frame_ = 5;
+    int seq_;
+    int crtl_call_;
 
     void ctrlCallback(const autoware_msgs::ControlCommand& msg);
-    void timerCallback();
+    
     void canSender();
     bool readfile();
     void run();
     double boundData(double low,double high,double& data);
-    
+    void Parse(uint8_t leng,uint32_t uid,const uint8_t* data);
 };
 
 }

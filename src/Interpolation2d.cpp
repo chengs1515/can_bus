@@ -3,6 +3,9 @@
 #include <cmath>
 #include <iostream>
 
+using std::cout;
+using std::endl;
+
 namespace {
 
 const double kDoubleEpsilon = 1.0e-6;
@@ -12,15 +15,19 @@ const double kDoubleEpsilon = 1.0e-6;
 
 namespace can_bus{
 
-    bool Interpolation2d::Init(const DataType &xyz) {
-    if (xyz.empty()) {
-        std::cout << "empty input.";
-        return false;
-    }
-    for (const auto &t : xyz) {
-        xyz_[std::get<0>(t)][std::get<1>(t)] = std::get<2>(t);
-    }
-    return true;
+bool Interpolation2d::Init(const DataType &xyz) {
+if (xyz.empty()) {
+    std::cout << "empty input.";
+    return false;
+}
+
+for (const auto &t : xyz) {
+    double x = std::get<0>(t);
+    double y = std::get<1>(t);
+    double z = std::get<2>(t);
+    xyz_[std::get<0>(t)][std::get<1>(t)] = std::get<2>(t);
+}
+return true;
 }
 
 double Interpolation2d::Interpolate(const KeyType &xy) const {

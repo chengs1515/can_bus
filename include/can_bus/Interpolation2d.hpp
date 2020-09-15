@@ -15,6 +15,7 @@ class Interpolation2d{
     typedef std::pair<double, double> KeyType;
 
     Interpolation2d() = default;
+    
 
     /**
      * @brief initialize Interpolation2D internal table
@@ -31,6 +32,8 @@ class Interpolation2d{
     double Interpolate(const KeyType &xy) const;
 
     private:
+    std::map<double, std::map<double, double>> xyz_;
+
     double InterpolateYz(const std::map<double, double> &yz_table,
                         double y) const;
 
@@ -38,7 +41,7 @@ class Interpolation2d{
                             const double value_after,
                             const double dist_after) const;
 
-    std::map<double, std::map<double, double>> xyz_;
+    
 
 };
 }
