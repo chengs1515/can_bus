@@ -1,6 +1,6 @@
 calibration {
   speed: 0.0
-  acceleration: -2.51
+  acceleration: -2.5
   command: -28.0
 }
 calibration {
