@@ -15,12 +15,12 @@ LonCtrl::LonCtrl()
     if(!readfile())
     {
         cout<<"can not read the calibration table"<<endl;
-        //ros::shutdown();
+        ros::shutdown();
     }
     if(!ctr_interp_.Init(this->xyz_))
     {
         std::cout<<"interpolation failed"<<std::endl;
-        //ros::shutdown();
+        ros::shutdown();
     }
 }
 

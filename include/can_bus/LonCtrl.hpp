@@ -1,7 +1,7 @@
 #pragma once
 
 #include <fstream>
-
+#include <ros/ros.h>
 #include "Interpolation2d.hpp"
 
 namespace can_bus
