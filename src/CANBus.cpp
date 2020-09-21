@@ -3,7 +3,6 @@
 #include <iostream>
 #include <algorithm>
 #include <ros/time.h>
-#include <fstream>
 
 #include "../include/can_bus/byte.h"
 
@@ -12,23 +11,13 @@
 using  can_bus::EsdCAN;
 using std::cout;
 using std::endl;
-using std::ios;
 
 namespace can_bus{
 
 CANBus::CANBus(ros::NodeHandle &NodeHandle):nh_(NodeHandle)
 {
     can_client_ = new EsdCAN(0);
-    if(!readfile())
-    {
-        cout<<"can not read the calibration table"<<endl;
-        ros::shutdown();
-    }
-    if(!ctr_interp_.Init(this->xyz_))
-    {
-        std::cout<<"interpolation failed"<<std::endl;
-        ros::shutdown();
-    }
+    
     cout<<"init sucessfully"<<endl;
     ctr_sub_ = nh_.subscribe("/ctrl_cmd",1,&CANBus::ctrlCallback,this);
     can_pb_ = nh_.advertise<autoware_msgs::VehicleStatus>("/vehicle_status",1);
@@ -38,59 +27,6 @@ CANBus::CANBus(ros::NodeHandle &NodeHandle):nh_(NodeHandle)
     crtl_call_ = 0;
 }
 
-bool CANBus::readfile()
-{
-    std::ifstream ifs;
-    ifs.open("/home/vci-2019/work_ws/src/can_bus/src/calibration.txt",ios::in);
-    if(!ifs)
-    {
-        cout<<"read calibration table failed"<<endl;
-        return false;
-    }
-    cout<<"read calibration file sucess"<<endl;
-    char buffer[1024] = {0};
-    double speed = -1,acc,command;
-    std::string spstr = "speed:";
-    std::string accstr = "acceleration:";
-    std::string comstr = "command:";
-    while(ifs>>buffer)
-    {
-        if(buffer == spstr)
-        {
-            ifs>>buffer;
-            speed = std::stod(buffer);
-            if((ifs>>buffer)&&(buffer == accstr))
-            {
-                ifs>>buffer;
-                acc = std::stod(buffer);
-            }
-            else
-            {
-                std::cout<<"文件格式不对，重新检查文件"<<std::endl;
-                return false;
-            }
-            if((ifs>>buffer)&&(buffer == comstr))
-            {
-                ifs>>buffer;
-                command = std::stod(buffer);
-            }
-            else
-            {
-                std::cout<<"文件格式不对，重新检查文件"<<std::endl;
-                return false;
-            }
-        }
-        if(speed>-0.5)
-        {
-            //cout<<speed*acc*command<<endl;
-            auto y = std::make_tuple(speed,acc,command);
-           // cout<<std::get<0>(y)<<endl;
-            xyz_.push_back(std::make_tuple(speed,acc,command));
-            speed = -1;
-        }
-    }
-    return true;
-}
 
 void CANBus::ctrlCallback(const autoware_msgs::ControlCommand& msg)
 {
@@ -124,8 +60,9 @@ void CANBus::ctrlCallback(const autoware_msgs::ControlCommand& msg)
 
     
     double throttle_cmd, brake_cmd, gear_cmd = 0;
-
-    double calib_val = ctr_interp_.Interpolate(std::make_pair(vel_,msg.linear_acceleration));
+    double diff = msg.linear_velocity - vel_;
+    double ts = 0.01;
+    double calib_val = longctrl_.pidcontroller(diff,ts,vel_)
 
     if(calib_val>=0)
     {
@@ -141,7 +78,7 @@ void CANBus::ctrlCallback(const autoware_msgs::ControlCommand& msg)
     throttle_cmd = std::min(throttle_cmd,100.0);
     brake_cmd = std::min(brake_cmd,100.0);
     double str_cmd = msg.steering_angle;//right为正
-    boundData(-0.524,0.524,str_cmd);
+    boundData(-0.333,0.333,str_cmd);
     int str_cmd_int = static_cast<int>(str_cmd / 0.001000);
     uint8_t t = 0;
     int x;

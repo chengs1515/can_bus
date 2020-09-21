@@ -8,8 +8,8 @@
             "includePath": [
                 "/opt/ros/melodic/include/**",
                 "/usr/include/**",
-                "/home/vci-2019/autoware.ai/install/**",
-                "/home/vci-2019/work_ws/**"
+                "/home/chengs/autoware.ai/**",
+                "/home/chengs/work_ws/**"
             ],
             "name": "ROS",
             "intelliSenseMode": "gcc-x64",
